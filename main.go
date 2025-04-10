@@ -43,10 +43,52 @@ func deleteFile(name string) {
 	if err != nil {
 		fmt.Println("Ошибка при удалении файла:", err)
 	}
-	fmt.Printf("Файл %s удален", name)
+	fmt.Printf("Файл %s удален \n", name)
+}
+
+func menu() {
+	for {
+		var userInput string
+		fmt.Println(`Выберите действие:
+	1 - создать файл
+	2 - переименовать файл
+	3 - проверить файл
+	4 - удалить файл
+	`)
+		fmt.Scan(&userInput)
+		switch userInput {
+		case "1":
+			var name string
+			fmt.Print("Введите название файла: ")
+			fmt.Scan(&name)
+			createFile(name)
+		case "2":
+			var name string
+			var newName string
+			fmt.Print("Введите старое название: ")
+			fmt.Scan(&name)
+			fmt.Print("Введите новое название: ")
+			fmt.Scan(&newName)
+			renameFile(name, newName)
+		case "3":
+			var name string
+			fmt.Print("Введите название файла: ")
+			fmt.Scan(&name)
+			existFile(name)
+		case "4":
+			var name string
+			fmt.Print("Введите название файла: ")
+			fmt.Scan(&name)
+			deleteFile(name)
+		}
+	}
 }
 
 func main() {
+	menu()
+}
+
+/*
 	args := os.Args
 	if len(args) < 3 {
 		fmt.Println("Использование: create|rename|check|delete и нужные аргументы")
@@ -89,3 +131,4 @@ func main() {
 	}
 
 }
+*/
