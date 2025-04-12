@@ -65,7 +65,7 @@ func writeNewText(fileName string, userText string) {
 	if err != nil {
 		fmt.Println("Ошибка записи:", err)
 	}
-	fmt.Println("✅ ваш текст успешно сохранен")
+	fmt.Println("✅ Ваш текст успешно сохранен")
 
 }
 
@@ -84,7 +84,7 @@ func readFile(fileName string) {
 		fmt.Println("Ошибка чтения:", err)
 		return
 	}
-	fmt.Println("Содержимое файла:")
+	fmt.Println("✅ Содержимое файла:")
 	fmt.Println(string(buf[:n]))
 }
 
@@ -110,7 +110,42 @@ func copyText(fileOne, fileTwo string) {
 		return
 	}
 
-	fmt.Printf("Все данные из файла %v успешно скопированы в файл %v ", fileOne, fileTwo)
+	fmt.Printf("✅ Все данные из файла %v успешно скопированы в файл %v ", fileOne, fileTwo)
+}
+
+// построчный вывод текста из файла
+func bufScan(fileName string) {
+	file, err := os.Open(fileName)
+	if err != nil {
+		fmt.Println("ошибка при отрытии первого файла: ", err)
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
+}
+
+// поиск строки по слову
+func finder(fileName, text string) {
+	file, err := os.Open(fileName)
+	if err != nil {
+		fmt.Println("ошибка при отрытии первого файла: ", err)
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		if strings.Contains(scanner.Text(), text) {
+			fmt.Println(scanner.Text())
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		fmt.Println("Ошибка при чтении файла: ", err)
+	}
 }
 
 func menu() {
@@ -126,7 +161,8 @@ func menu() {
 	5️⃣ - запись текста в файл
 	6️⃣ - показать текст файле
 	7️⃣ - скопировать текст в другой файл
-	8️⃣ - todo
+	8️⃣ - построчный вывод текста из файла
+	9️⃣ - найти строку по ключевому слову
 --------------------------------
 🅾️ - выход
 	`)
@@ -182,7 +218,24 @@ func menu() {
 			fmt.Scan(&fileTwo)
 			fmt.Println()
 			copyText(fileOne, fileTwo)
+		case "8":
+			var fileName string
+			fmt.Print("Введите название файла: ")
+			fmt.Scan(&fileName)
+			fmt.Println()
+			bufScan(fileName)
+		case "9":
+			var fileName string
+			var text string
 
+			fmt.Print("Введите название файла: ")
+			fmt.Scan(&fileName)
+			fmt.Println()
+			fmt.Print("Введите текст для поиска строки: ")
+			fmt.Scan(&text)
+			fmt.Println()
+
+			finder(fileName, text)
 		case "0":
 			os.Exit(0)
 		}
