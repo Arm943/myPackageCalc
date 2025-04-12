@@ -8,17 +8,8 @@ import (
 	"strings"
 )
 
-<<<<<<< Updated upstream
-<<<<<<< HEAD
-=======
-// тест тест
-// ветка проверка
-// v2.1.1
->>>>>>> develop
-=======
-// Главная версия программы
+// v2.1.1 версия программы
 
->>>>>>> Stashed changes
 var name string
 var newName string
 
