@@ -8,6 +8,8 @@ import (
 	"strings"
 )
 
+//ветка проверка
+
 var name string
 var newName string
 
