@@ -8,7 +8,12 @@ import (
 	"strings"
 )
 
+<<<<<<< HEAD
+//ветка проверка
+
+=======
 // v2.1.1
+>>>>>>> develop
 var name string
 var newName string
 
