@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"strings"
 )
@@ -18,28 +19,31 @@ var newName string
 func createFile(name string) {
 	file, err := os.Create(name)
 	if err != nil {
-		fmt.Println("Ошибка при создании файла:", err)
+		logErr("Ошибка при создании файла", err)
+		return
 	}
 	defer file.Close()
-	fmt.Println("✅ Файл создан:", name)
+	logInfoMsg("✅ Файл создан:", name)
 }
 
 // переименовать файл
 func renameFile(name, newName string) {
 	err := os.Rename(name, newName)
 	if err != nil {
-		fmt.Println("Ошибка при переименовывании файла:", err)
+		logErr("Ошибка при переименовывании файла:", err)
+		return
 	}
-	fmt.Println("✅ Новое имя файла:", newName)
+	logInfoMsg("✅ Новое имя файла:", newName)
 }
 
 // проверка существует ли файл
 func existFile(name string) {
 	_, err := os.Stat(name)
 	if os.IsNotExist(err) {
-		fmt.Println("Файл не существует")
+		fmt.Println("Файл не существует", name)
+		logInfoMsg("Файл не существует", name)
 	} else {
-		fmt.Println("✅ Файл существует")
+		logInfoMsg("✅ Файл существует", name)
 	}
 }
 
@@ -47,9 +51,10 @@ func existFile(name string) {
 func deleteFile(name string) {
 	err := os.Remove(name)
 	if err != nil {
-		fmt.Println("Ошибка при удалении файла:", err)
+		logErr("Ошибка при удалении файла:", err)
+		return
 	}
-	fmt.Printf("✅ Файл %s удален \n", name)
+	logInfoMsg("✅ Файл %s удален \n", name)
 }
 
 // ФУНКЦИИ ДЛЯ РАБОТЫ С СОДЕРЖИМЫМ ФАЙЛОВ
@@ -58,16 +63,16 @@ func deleteFile(name string) {
 func writeNewText(fileName string, userText string) {
 	file, err := os.OpenFile(fileName, os.O_WRONLY|os.O_TRUNC, 0666)
 	if err != nil {
-		fmt.Println("Ошибка отрытия файла:", err)
+		logErr("Ошибка отрытия файла:", err)
 		return
 	}
 	defer file.Close()
 
 	_, err = file.Write([]byte(userText))
 	if err != nil {
-		fmt.Println("Ошибка записи:", err)
+		logErr("Ошибка записи:", err)
 	}
-	fmt.Println("✅ Ваш текст успешно сохранен")
+	logInfoMsg("✅ Ваш текст успешно сохранен в ", fileName)
 
 }
 
@@ -75,7 +80,7 @@ func writeNewText(fileName string, userText string) {
 func readFile(fileName string) {
 	file, err := os.Open(fileName)
 	if err != nil {
-		fmt.Println("Ошибка открытия файла:", err)
+		logErr("Ошибка открытия файла:", err)
 		return
 	}
 	defer file.Close()
@@ -83,7 +88,7 @@ func readFile(fileName string) {
 	buf := make([]byte, 1024)
 	n, err := file.Read(buf)
 	if err != nil && err != io.EOF {
-		fmt.Println("Ошибка чтения:", err)
+		logErr("Ошибка чтения:", err)
 		return
 	}
 	fmt.Println("✅ Содержимое файла:")
@@ -94,32 +99,32 @@ func readFile(fileName string) {
 func copyText(fileOne, fileTwo string) {
 	fOne, err := os.Open(fileOne)
 	if err != nil {
-		fmt.Println("ошибка при отрытии первого файла: ", err)
+		logErr("ошибка при отрытии первого файла: ", err)
 		return
 	}
 	defer fOne.Close()
 
 	fTwo, err := os.OpenFile(fileTwo, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
-		fmt.Println("ошибка при отрытии второго файла: ", err)
+		logErr("ошибка при отрытии второго файла: ", err)
 		return
 	}
 	defer fTwo.Close()
 
 	_, err = io.Copy(fTwo, fOne)
 	if err != nil {
-		fmt.Println("Ошибка при копировании:", err)
+		logErr("Ошибка при копировании:", err)
 		return
 	}
 
-	fmt.Printf("✅ Все данные из файла %v успешно скопированы в файл %v ", fileOne, fileTwo)
+	logTreeInfoMsg("✅ Все данные из файла %v успешно скопированы в файл %v ", fileOne, fileTwo)
 }
 
 // построчный вывод текста из файла
 func bufScan(fileName string) {
 	file, err := os.Open(fileName)
 	if err != nil {
-		fmt.Println("ошибка при отрытии первого файла: ", err)
+		logErr("ошибка при отрытии первого файла: ", err)
 		return
 	}
 	defer file.Close()
@@ -134,7 +139,7 @@ func bufScan(fileName string) {
 func finder(fileName, text string) {
 	file, err := os.Open(fileName)
 	if err != nil {
-		fmt.Println("ошибка при отрытии первого файла: ", err)
+		logErr("ошибка при отрытии первого файла: ", err)
 		return
 	}
 	defer file.Close()
@@ -146,17 +151,18 @@ func finder(fileName, text string) {
 		}
 	}
 	if err := scanner.Err(); err != nil {
-		fmt.Println("Ошибка при чтении файла: ", err)
+		logErr("Ошибка при чтении файла: ", err)
 	}
 }
 
 func menu() {
 	for {
 		var userInput string
+
 		fmt.Println()
 		fmt.Println(`--------------------------------
 👉 Выберите действие:
-   1️⃣ - создать файл
+   1️⃣ - создать файл 
    2️⃣ - переименовать файл
    3️⃣ - проверить файл
    4️⃣ - удалить файл
@@ -169,12 +175,14 @@ func menu() {
 🅾️ - выход
 	`)
 		fmt.Scan(&userInput)
+		logBlackBox(string(userInput))
 		switch userInput {
 		case "1":
 			var name string
 			fmt.Print("Введите название файла: ")
 			fmt.Scan(&name)
 			createFile(name)
+			logBlackBox(name)
 		case "2":
 			var name string
 			var newName string
@@ -183,41 +191,49 @@ func menu() {
 			fmt.Print("Введите новое название: ")
 			fmt.Scan(&newName)
 			renameFile(name, newName)
+			logBlackBox(newName)
 		case "3":
 			var name string
 			fmt.Print("Введите название файла: ")
 			fmt.Scan(&name)
 			existFile(name)
+			logBlackBox(name)
 		case "4":
 			var name string
 			fmt.Print("Введите название файла: ")
 			fmt.Scan(&name)
 			deleteFile(name)
+			logBlackBox(name)
 		case "5":
 			var fileName string
 			fmt.Print("Введите название файла: ")
 			fmt.Scan(&fileName)
 			fmt.Scanln()
+			logBlackBox(name)
 
 			fmt.Print("Введите свой текст: ")
 			reader := bufio.NewReader(os.Stdin)
 			userText, _ := reader.ReadString('\n')
 			userText = strings.TrimSpace(userText)
 			writeNewText(fileName, userText)
+			logBlackBox(userText)
 		case "6":
 			var fileName string
 			fmt.Print("Введите название файла: ")
 			fmt.Scan(&fileName)
 			fmt.Println()
 			readFile(fileName)
+			logBlackBox(fileName)
 		case "7":
 			var fileOne string
 			var fileTwo string
 
 			fmt.Println("Введите название файла ОТКУДА хотите скопировать текст: ")
 			fmt.Scan(&fileOne)
+			logBlackBox(fileOne)
 			fmt.Println("Введите название файла КУДА хотите скопировать текст: ")
 			fmt.Scan(&fileTwo)
+			logBlackBox(fileTwo)
 			fmt.Println()
 			copyText(fileOne, fileTwo)
 		case "8":
@@ -226,6 +242,7 @@ func menu() {
 			fmt.Scan(&fileName)
 			fmt.Println()
 			bufScan(fileName)
+			logBlackBox(fileName)
 		case "9":
 			var fileName string
 			var text string
@@ -233,19 +250,49 @@ func menu() {
 			fmt.Print("Введите название файла: ")
 			fmt.Scan(&fileName)
 			fmt.Println()
+			logBlackBox(fileName)
 			fmt.Print("Введите текст для поиска строки: ")
 			fmt.Scan(&text)
 			fmt.Println()
+			logBlackBox(text)
 
 			finder(fileName, text)
 		case "0":
 			os.Exit(0)
+		default:
+			log.Println("Выберите пункт из меню")
 		}
 
 	}
 }
 
+// отправляем логи в файл
+func logSetOutput() {
+	file, err := os.OpenFile("logs.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.SetOutput(file)
+	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+}
+
+//варианты логов
+
+func logErr(msg string, err error) {
+	log.Println("⛔[ERROR] :", msg, err)
+}
+func logInfoMsg(msg, info string) {
+	log.Println("[INFO] :", msg, info)
+}
+func logTreeInfoMsg(msg, info1, info2 string) {
+	log.Println("[INFO] :", msg, info1, info2)
+}
+func logBlackBox(info1 string) { //users experience for analytics
+	log.Println("[UX] :", info1)
+}
+
 func main() {
+	logSetOutput()
 	menu()
 }
 
